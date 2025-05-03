@@ -1,0 +1,65 @@
+import time
+import random
+import json
+from datetime import datetime, timedelta
+
+# --- MODULE 1: Sensor Simulation with Schedule ---
+class SmartSensor:
+    def __init__(self):
+        self.base_load = 2.0  # base usage in kWh
+
+    def simulate_reading(self, hour):
+        peak = 1.5 if 8 <= hour <= 18 else 0.5
+        usage = self.base_load + peak + random.uniform(-0.3, 0.3)
+        return {
+            "timestamp": datetime.now().isoformat(),
+            "hour": hour,
+            "usage_kWh": round(usage, 2)
+        }
+
+# --- MODULE 2: Anomaly Detection ---
+class AnomalyDetector:
+    def __init__(self, threshold=4.0):
+        self.threshold = threshold
+
+    def detect(self, reading):
+        return reading["usage_kWh"] > self.threshold
+
+# --- MODULE 3: Schedule-Based Optimizer ---
+class SchedulerOptimizer:
+    def get_recommendation(self, hour):
+        if 8 <= hour <= 18:
+            return {"HVAC_mode": "comfort", "Lights_on": True}
+        else:
+            return {"HVAC_mode": "eco", "Lights_on": False}
+
+# --- MODULE 4: BMS Simulator ---
+class BMS:
+    def __init__(self):
+        self.state = {"HVAC_mode": "comfort", "Lights_on": True}
+
+    def apply(self, config):
+        self.state.update(config)
+        print(f"[BMS] Updated Settings: {self.state}")
+
+# --- MODULE 5: System Orchestration ---
+def run_simulation():
+    sensor = SmartSensor()
+    detector = AnomalyDetector()
+    optimizer = SchedulerOptimizer()
+    bms = BMS()
+
+    for i in range(5):  # Simulate 5 time steps
+        current_hour = (datetime.now() + timedelta(hours=i)).hour
+        reading = sensor.simulate_reading(current_hour)
+        print(f"\n[Sensor] Hour: {current_hour}, Usage: {reading['usage_kWh']} kWh")
+
+        if detector.detect(reading):
+            print("⚠️ [Alert] Anomalous energy usage detected!")
+
+        recommendation = optimizer.get_recommendation(current_hour)
+        bms.apply(recommendation)
+        time.sleep(1)
+
+if __name__ == "__main__":
+    run_simulation()
