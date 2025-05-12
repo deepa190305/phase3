@@ -1,0 +1,36 @@
+import random
+
+def simulate_sensor_data():
+    temperature = random.uniform(20, 35)     # in Celsius
+    occupancy = random.choice([0, 1])        # 0 = no one, 1 = someone present
+    device_usage = random.uniform(0.5, 3.5)  # in kWh
+    return temperature, occupancy, device_usage
+
+def estimate_energy_usage(temp, occupancy, usage):
+    base_energy = usage
+    if occupancy == 1:
+        base_energy += 0.5  # increase for active usage
+    if temp > 30:
+        base_energy += 1.0  # extra cooling required
+    return round(base_energy, 2)
+
+def give_suggestion(energy):
+    if energy > 4:
+        return "High energy usage. Turn off unused devices."
+    elif energy > 3:
+        return "Moderate usage. Try adjusting temperature settings."
+    else:
+        return "Energy usage is efficient."
+
+def main():
+    print("Smart Energy Optimization System (Simple Version)\n")
+    for _ in range(5):  # simulate 5 readings
+        temp, occ, usage = simulate_sensor_data()
+        energy = estimate_energy_usage(temp, occ, usage)
+        suggestion = give_suggestion(energy)
+        print(f"Temperature: {temp:.1f}°C | Occupancy: {occ} | Device Usage: {usage:.2f} kWh")
+        print(f"Estimated Energy: {energy} kWh → Suggestion: {suggestion}")
+        print("-" * 60)
+
+if __name__ == "__main__":
+    main()
